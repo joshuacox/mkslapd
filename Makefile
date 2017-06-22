@@ -81,9 +81,9 @@ PASS:
 		read -r -p "Enter the admin pass you wish to associate with this container [PASS]: " PASS; echo "$$PASS">>PASS; cat PASS; \
 	done ;
 
-PHPLDADPADMIN_PORT:
-	@while [ -z "$$PHPLDADPADMIN_PORT" ]; do \
-		read -r -p "Enter the admin pass you wish to associate with this container [PHPLDADPADMIN_PORT]: " PHPLDADPADMIN_PORT; echo "$$PHPLDADPADMIN_PORT">>PHPLDADPADMIN_PORT; cat PHPLDADPADMIN_PORT; \
+PHPLDAPADMIN_PORT:
+	@while [ -z "$$PHPLDAPADMIN_PORT" ]; do \
+		read -r -p "Enter the admin pass you wish to associate with this container [PHPLDAPADMIN_PORT]: " PHPLDAPADMIN_PORT; echo "$$PHPLDAPADMIN_PORT">>PHPLDAPADMIN_PORT; cat PHPLDAPADMIN_PORT; \
 	done ;
 
 DOMAIN:
@@ -96,14 +96,14 @@ DATADIR:
 		read -r -p "Enter the datadir you wish to associate with this container [DATADIR]: " DATADIR; echo "$$DATADIR">>DATADIR; cat DATADIR; \
 	done ;
 
-phpldapadmin: PHPLDADPADMIN_PORT phpldapadmincid
+phpldapadmin: PHPLDAPADMIN_PORT phpldapadmincid
 
 phpldapadmincid:
 	$(eval DATADIR := $(shell cat DATADIR))
 	$(eval NAME := $(shell cat NAME))
 	$(eval PWD := $(shell pwd))
 	$(eval PASS := $(shell cat PASS))
-	$(eval PHPLDADPADMIN_PORT := $(shell cat PHPLDADPADMIN_PORT))
+	$(eval PHPLDAPADMIN_PORT := $(shell cat PHPLDAPADMIN_PORT))
 	$(eval DOMAIN := $(shell cat DOMAIN))
 	chmod 777 $(TMP)
 	@docker run --name=$(NAME)-phpldapadmin \
