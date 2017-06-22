@@ -100,6 +100,7 @@ phpldapadmincid:
 	$(eval NAME := $(shell cat NAME))
 	$(eval PWD := $(shell pwd))
 	$(eval PASS := $(shell cat PASS))
+	$(eval PHPLDADPADMIN_PORT := $(shell cat PHPLDADPADMIN_PORT))
 	$(eval DOMAIN := $(shell cat DOMAIN))
 	chmod 777 $(TMP)
 	@docker run --name=$(NAME)-phpldapadmin \
