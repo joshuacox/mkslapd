@@ -48,10 +48,13 @@ runprod:
 
 kill:
 	-@docker kill `cat cid`
+	-@docker kill `cat phpldapadmincid`
 
 rm-image:
 	-@docker rm `cat cid`
 	-@rm cid
+	-@docker rm `cat phpldapadmincid`
+	-@rm phpldapadmincid
 
 rm: kill rm-image
 
