@@ -16,34 +16,48 @@ help:
 # run a plain container
 run: DATADIR NAME TAG PASS DOMAIN prod phpldapadmin
 
+init: DATADIR NAME TAG PASS DOMAIN rm runinit prod
+
 prod: rm runprod
 
 jessie:
 	sudo bash local-jessie.sh
 
-runprod:
+runinit:
 	$(eval DATADIR := $(shell cat DATADIR))
-	$(eval TMP := $(shell mktemp -d --suffix=DOCKERTMP))
 	$(eval NAME := $(shell cat NAME))
 	$(eval TAG := $(shell cat TAG))
 	$(eval PWD := $(shell pwd))
 	$(eval PASS := $(shell cat PASS))
 	$(eval DOMAIN := $(shell cat DOMAIN))
-	chmod 777 $(TMP)
 	@docker run --name=$(NAME) \
 	--cidfile="cid" \
-	-v $(TMP):/tmp \
 	-d \
 	-p 389:389 \
 	-p 636:636 \
-	-e SLAPD_PASSWORD=${PASS} \
-	-e SLAPD_DOMAIN=${DOMAIN} \
-	-e SLAPD_ADDITIONAL_SCHEMAS=collective,corba,duaconf,dyngroup,java,misc,openldap,pmi,policy \
-	-e SLAPD_ADDITIONAL_MODULES=memberof,ppolicy \
+	--hostname ${DOMAIN} \
+	-e LDAP_DOMAIN=${DOMAIN} \
+	-e LDAP_ADMIN_PASSWORD=${PASS} \
+	-e LDAP_CONFIG_PASSWORD=${PASS} \
+	-e LDAP_ORGANISATION=${ORG} \
+	-v $(DATADIR)/data:/var/lib/ldap \
+	-v $(DATADIR)/config:/etc/ldap/slap.d \
+	-t $(TAG)
+
+runprod:
+	$(eval DATADIR := $(shell cat DATADIR))
+	$(eval NAME := $(shell cat NAME))
+	$(eval TAG := $(shell cat TAG))
+	$(eval PWD := $(shell pwd))
+	$(eval PASS := $(shell cat PASS))
+	$(eval DOMAIN := $(shell cat DOMAIN))
+	@docker run --name=$(NAME) \
+	--cidfile="cid" \
+	-d \
+	-p 389:389 \
+	-p 636:636 \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap \
-	-v ${PWD}/prepopulate:/etc/ldap.dist/prepopulate \
-	-v $(shell which docker):/bin/docker \
 	-t $(TAG)
 
 kill:
