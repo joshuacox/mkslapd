@@ -14,7 +14,7 @@ help:
 	@echo ""   3. make logs      - follow the logs of docker container
 
 # run a plain container
-run: DATADIR NAME TAG PASS DOMAIN prod
+run: DATADIR NAME TAG PASS DOMAIN prod phpldapadmin
 
 prod: rm runprod
 
@@ -78,6 +78,11 @@ PASS:
 		read -r -p "Enter the admin pass you wish to associate with this container [PASS]: " PASS; echo "$$PASS">>PASS; cat PASS; \
 	done ;
 
+PHPLDADPADMIN_PORT:
+	@while [ -z "$$PHPLDADPADMIN_PORT" ]; do \
+		read -r -p "Enter the admin pass you wish to associate with this container [PHPLDADPADMIN_PORT]: " PHPLDADPADMIN_PORT; echo "$$PHPLDADPADMIN_PORT">>PHPLDADPADMIN_PORT; cat PHPLDADPADMIN_PORT; \
+	done ;
+
 DOMAIN:
 	@while [ -z "$$DOMAIN" ]; do \
 		read -r -p "Enter the domain you wish to associate with this container [DOMAIN]: " DOMAIN; echo "$$DOMAIN">>DOMAIN; cat DOMAIN; \
@@ -87,3 +92,21 @@ DATADIR:
 	@while [ -z "$$DATADIR" ]; do \
 		read -r -p "Enter the datadir you wish to associate with this container [DATADIR]: " DATADIR; echo "$$DATADIR">>DATADIR; cat DATADIR; \
 	done ;
+
+phpldapadmin: PHPLDADPADMIN_PORT phpldapadmincid
+
+phpldapadmincid:
+	$(eval DATADIR := $(shell cat DATADIR))
+	$(eval NAME := $(shell cat NAME))
+	$(eval PWD := $(shell pwd))
+	$(eval PASS := $(shell cat PASS))
+	$(eval DOMAIN := $(shell cat DOMAIN))
+	chmod 777 $(TMP)
+	@docker run --name=$(NAME)-phpldapadmin \
+	--cidfile="phpldapadmincid" \
+	-d \
+	-p ${PHPLDAPADMIN_PORT}:80 \
+	-e PHPLDAPADMIN_HTTPS=false \
+	--link ${NAME}:ldap-host \
+	-e PHPLDAPADMIN_LDAP_HOSTS=ldap-host \
+	-t osixia/phpldapadmin:0.6.12
