@@ -51,6 +51,9 @@ runprod:
 	$(eval PWD := $(shell pwd))
 	$(eval PASS := $(shell cat PASS))
 	$(eval DOMAIN := $(shell cat DOMAIN))
+	$(eval DN := $(shell cat DOMAIN |cut -f1 -d.))
+	$(eval TLD := $(shell cat DOMAIN |cut -f2 -d.))
+	$(eval CN := $(shell envsubst cn.template))
 	@docker run --name=$(NAME) \
 	--cidfile="cid" \
 	-d \
@@ -130,3 +133,6 @@ phpldapadmincid:
 
 prepopulate:
 	cp -av prepopulate.tempate prepopulate
+
+creds: DOMAIN PASS
+	./showcreds

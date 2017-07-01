@@ -1,0 +1,9 @@
+#!/bin/bash
+DOMAIN=$(cat DOMAIN)
+export DN=$(cat DOMAIN |cut -f1 -d.)
+export TLD=$(cat DOMAIN |cut -f2 -d.)
+CN=$(envsubst < cn.template)
+PASS=$(cat PASS)
+
+echo ${CN}
+echo ${PASS}
