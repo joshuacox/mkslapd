@@ -39,21 +39,19 @@ runinit:
 	-e LDAP_DOMAIN=${DOMAIN} \
 	-e LDAP_ADMIN_PASSWORD=${PASS} \
 	-e LDAP_CONFIG_PASSWORD=${PASS} \
-	-e LDAP_ORGANISATION=${ORG} \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slap.d \
 	-t $(TAG)
 
 runprod:
-	$(eval DATADIR := $(shell cat DATADIR))
 	$(eval NAME := $(shell cat NAME))
-	$(eval TAG := $(shell cat TAG))
-	$(eval PWD := $(shell pwd))
-	$(eval PASS := $(shell cat PASS))
 	$(eval DOMAIN := $(shell cat DOMAIN))
+	$(eval DATADIR := $(shell cat DATADIR))
+	$(eval TAG := $(shell cat TAG))
 	@docker run --name=$(NAME) \
 	--cidfile="cid" \
 	-d \
+	--hostname ${DOMAIN} \
 	-p 389:389 \
 	-p 636:636 \
 	-v $(DATADIR)/data:/var/lib/ldap \
