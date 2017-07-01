@@ -128,3 +128,6 @@ phpldapadmincid:
 	--link ${NAME}:ldap-host \
 	-e PHPLDAPADMIN_LDAP_HOSTS=ldap-host \
 	-t osixia/phpldapadmin:0.6.12
+
+prepopulate:
+	cp -av prepopulate.tempate prepopulate
