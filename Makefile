@@ -57,7 +57,7 @@ runprod:
 	-p 389:389 \
 	-p 636:636 \
 	-v $(DATADIR)/data:/var/lib/ldap \
-	-v $(DATADIR)/config:/etc/ldap \
+	-v $(DATADIR)/config:/etc/ldap/slap.d \
 	-t $(TAG)
 
 kill:
