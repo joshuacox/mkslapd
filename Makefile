@@ -16,7 +16,7 @@ help:
 # run a plain container
 run: DATADIR NAME TAG PASS DOMAIN prod phpldapadmin
 
-init: DATADIR NAME TAG PASS DOMAIN rm runinit prod
+init: DATADIR NAME TAG PASS DOMAIN rm runinit
 
 prod: rm runprod
 
