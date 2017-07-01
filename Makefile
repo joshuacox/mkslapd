@@ -40,7 +40,7 @@ runinit:
 	-e LDAP_ADMIN_PASSWORD=${PASS} \
 	-e LDAP_CONFIG_PASSWORD=${PASS} \
 	-v $(DATADIR)/data:/var/lib/ldap \
-	-v $(DATADIR)/config:/etc/ldap/slap.d \
+	-v $(DATADIR)/config:/etc/ldap/slapd.d \
 	-t $(TAG)
 
 runprod:
@@ -55,7 +55,7 @@ runprod:
 	-p 389:389 \
 	-p 636:636 \
 	-v $(DATADIR)/data:/var/lib/ldap \
-	-v $(DATADIR)/config:/etc/ldap/slap.d \
+	-v $(DATADIR)/config:/etc/ldap/slapd.d \
 	-t $(TAG)
 
 kill:
