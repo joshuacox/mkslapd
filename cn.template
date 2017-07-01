@@ -1,1 +1,1 @@
-cn=admin,dc=ldap,dc=$DN,dc=$TLD
+cn=admin,dc=$DN,dc=$TLD
