@@ -19,7 +19,7 @@ init: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_MAIL rm runinit
 
 prod: rm runprod
 
-runinit: .nginx.cid .letsencrypt.cid
+runinit: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	$(eval DATADIR := $(shell cat DATADIR))
 	$(eval NAME := $(shell cat NAME))
 	$(eval TAG := $(shell cat TAG))
@@ -44,7 +44,7 @@ runinit: .nginx.cid .letsencrypt.cid
 	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:rw \
 	-t $(TAG)
 
-runprod: .nginx.cid .letsencrypt.cid
+runprod: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	$(eval NAME := $(shell cat NAME))
 	$(eval DOMAIN := $(shell cat DOMAIN))
 	$(eval DATADIR := $(shell cat DATADIR))
