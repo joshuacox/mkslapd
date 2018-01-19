@@ -67,13 +67,22 @@ runprod: .nginx.cid .letsencrypt.cid
 
 kill:
 	-@docker kill `cat cid`
-	-@docker kill `cat phpldapadmincid`
+	-@docker kill `cat .phpldapadmin.cid`
+	-@docker kill `cat .letsencrypt.cid`
+	-@docker kill `cat .nginx.cid`
+	-@docker kill `cat .nginx-gen.cid`
 
 rm-image:
 	-@docker rm `cat cid`
 	-@rm cid
-	-@docker rm `cat phpldapadmincid`
-	-@rm phpldapadmincid
+	-@docker rm `cat .phpldapadmin.cid`
+	-@rm .phpldapadmin.cid
+	-@docker rm `cat .nginx.cid`
+	-@rm .nginx.cid
+	-@docker rm `cat .nginx-gen.cid`
+	-@rm .nginx-gen.cid
+	-@docker rm `cat .letsencrypt.cid`
+	-@rm .letsencrypt.cid
 
 rm: kill rm-image
 
