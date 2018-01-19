@@ -41,7 +41,7 @@ runinit: .nginx.cid .letsencrypt.cid
 	-e "LETSENCRYPT_MAIL=$(LETSENCRYPT_MAIL)" \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slapd.d \
-	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:ro \
+	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:rw \
 	-t $(TAG)
 
 runprod: .nginx.cid .letsencrypt.cid
@@ -61,7 +61,7 @@ runprod: .nginx.cid .letsencrypt.cid
 	-e "LETSENCRYPT_MAIL=$(LETSENCRYPT_MAIL)" \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slapd.d \
-	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:ro \
+	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:rw \
 	-t $(TAG)
 
 kill:
