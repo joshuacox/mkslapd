@@ -195,6 +195,8 @@ letsencrypt: .letsencrypt.cid
 	docker run -d \
 		--name=$(NAME)-nginx-letsencrypt \
 		--cidfile=".letsencrypt.cid" \
+		-e NGINX_DOCKER_GEN_CONTAINER=$(NAME)-nginx-gen \
+		-e NGINX_PROXY_CONTAINER=$(NAME)-nginx \
 		-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/etc/nginx/certs:rw \
 		-v /var/run/docker.sock:/var/run/docker.sock:ro \
 		--volumes-from $(NAME)-nginx \
