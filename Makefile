@@ -14,22 +14,20 @@ help:
 	@echo ""   3. make logs      - follow the logs of docker container
 
 # run a plain container
-run: DATADIR NAME TAG PASS DOMAIN prod phpldapadmin
+run: DATADIR NAME TAG PASS DOMAIN prod phpldapadmin LETSENCRYPT_MAIL
 
-init: DATADIR NAME TAG PASS DOMAIN rm runinit
+init: DATADIR NAME TAG PASS DOMAIN rm runinit LETSENCRYPT_MAIL
 
 prod: rm runprod
 
-jessie:
-	sudo bash local-jessie.sh
-
-runinit:
+runinit: .nginx.cid .letsencrypt.cid
 	$(eval DATADIR := $(shell cat DATADIR))
 	$(eval NAME := $(shell cat NAME))
 	$(eval TAG := $(shell cat TAG))
 	$(eval PWD := $(shell pwd))
 	$(eval PASS := $(shell cat PASS))
 	$(eval DOMAIN := $(shell cat DOMAIN))
+	$(eval LETSENCRYPT_MAIL := $(shell cat LETSENCRYPT_MAIL))
 	@docker run --name=$(NAME) \
 	--cidfile="cid" \
 	-d \
@@ -40,16 +38,19 @@ runinit:
 	-e LDAP_ADMIN_PASSWORD=${PASS} \
 	-e LDAP_CONFIG_PASSWORD=${PASS} \
 	-e "VIRTUAL_HOST=$(DOMAIN)" \
+	-e "LETSENCRYPT_HOST=$(DOMAIN)" \
+	-e "LETSENCRYPT_MAIL=$(LETSENCRYPT_MAIL)" \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slapd.d \
 	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:ro \
 	-t $(TAG)
 
-runprod:
+runprod: .nginx.cid .letsencrypt.cid
 	$(eval NAME := $(shell cat NAME))
 	$(eval DOMAIN := $(shell cat DOMAIN))
 	$(eval DATADIR := $(shell cat DATADIR))
 	$(eval TAG := $(shell cat TAG))
+	$(eval LETSENCRYPT_MAIL := $(shell cat LETSENCRYPT_MAIL))
 	@docker run --name=$(NAME) \
 	--cidfile="cid" \
 	-d \
@@ -57,6 +58,8 @@ runprod:
 	-p 389:389 \
 	-p 636:636 \
 	-e "VIRTUAL_HOST=$(DOMAIN)" \
+	-e "LETSENCRYPT_HOST=$(DOMAIN)" \
+	-e "LETSENCRYPT_MAIL=$(LETSENCRYPT_MAIL)" \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slapd.d \
 	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:ro \
@@ -107,27 +110,35 @@ DOMAIN:
 		read -r -p "Enter the domain you wish to associate with this container [DOMAIN]: " DOMAIN; echo "$$DOMAIN">>DOMAIN; cat DOMAIN; \
 	done ;
 
+LETSENCRYPT_MAIL:
+	@while [ -z "$$LETSENCRYPT_MAIL" ]; do \
+		read -r -p "Enter the admin email for letsencrypt you wish to associate with this container [LETSENCRYPT_MAIL]: " LETSENCRYPT_MAIL; echo "$$LETSENCRYPT_MAIL">>LETSENCRYPT_MAIL; cat LETSENCRYPT_MAIL; \
+	done ;
+
 DATADIR:
 	@while [ -z "$$DATADIR" ]; do \
 		read -r -p "Enter the datadir you wish to associate with this container [DATADIR]: " DATADIR; echo "$$DATADIR">>DATADIR; cat DATADIR; \
 	done ;
 
-phpldapadmin: PHPLDAPADMIN_PORT phpldapadmincid
+phpldapadmin: PHPLDAPADMIN_PORT .phpldapadmin.cid
 
-phpldapadmincid:
+.phpldapadmin.cid:
 	$(eval DATADIR := $(shell cat DATADIR))
 	$(eval NAME := $(shell cat NAME))
 	$(eval PWD := $(shell pwd))
 	$(eval PASS := $(shell cat PASS))
 	$(eval PHPLDAPADMIN_PORT := $(shell cat PHPLDAPADMIN_PORT))
 	$(eval DOMAIN := $(shell cat DOMAIN))
+	$(eval LETSENCRYPT_MAIL := $(shell cat LETSENCRYPT_MAIL))
 	@docker run --name=$(NAME)-phpldapadmin \
-	--cidfile="phpldapadmincid" \
+	--cidfile=".phpldapadmin.cid" \
 	-d \
 	-p ${PHPLDAPADMIN_PORT}:80 \
 	-e PHPLDAPADMIN_HTTPS=false \
 	--link ${NAME}:ldap-host \
 	-e "VIRTUAL_HOST=admin.$(DOMAIN)" \
+	-e "LETSENCRYPT_HOST=admin.$(DOMAIN)" \
+	-e "LETSENCRYPT_MAIL=$(LETSENCRYPT_MAIL)" \
 	-e PHPLDAPADMIN_LDAP_HOSTS=ldap-host \
 	-t osixia/phpldapadmin:0.6.12
 
@@ -137,7 +148,39 @@ prepopulate:
 creds: DOMAIN PASS
 	./showcreds
 
-letsencrypt:
+nginx: .nginx.cid
+
+.nginx.cid:
+	$(eval NAME := $(shell cat NAME))
+	$(eval DOMAIN := $(shell cat DOMAIN))
+	$(eval DATADIR := $(shell cat DATADIR))
+	docker run -d -p 80:80 -p 443:443 \
+		--name $(NAME)-nginx \
+		-v $(DATADIR)/nginx/conf.d:/etc/nginx/conf.d  \
+		-v $(DATADIR)/nginx/vhost.d:/etc/nginx/vhost.d \
+		-v $(DATADIR)/nginx/html:/usr/share/nginx/html \
+		-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/etc/nginx/certs:ro \
+		--label com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy \
+		nginx
+
+nginx-gen: .nginx-gen.cid
+
+.nginx-gen.cid: .nginx.cid
+	$(eval NAME := $(shell cat NAME))
+	$(eval DOMAIN := $(shell cat DOMAIN))
+	$(eval DATADIR := $(shell cat DATADIR))
+	docker run -d \
+		--name $(NAME)-nginx-gen \
+		--volumes-from $(NAME)-nginx \
+		-v $(DATADIR)/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro \
+		-v /var/run/docker.sock:/tmp/docker.sock:ro \
+		--label com.github.jrcs.letsencrypt_nginx_proxy_companion.docker_gen \
+		jwilder/docker-gen \
+		-notify-sighup $(NAME)-nginx -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+
+letsencrypt: .letsencrypt.cid
+
+.letsencrypt.cid: .nginx.cid
 	$(eval NAME := $(shell cat NAME))
 	$(eval DOMAIN := $(shell cat DOMAIN))
 	$(eval DATADIR := $(shell cat DATADIR))

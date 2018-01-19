@@ -6,4 +6,8 @@ DOMAIN
 NAME
 TAG
 PHPLDAPADMIN_PORT
-phpldapadmincid
+LETSENCRYPT_MAIL
+.phpldapadmin.cid
+.nginx-gen.cid
+.nginx.cid
+.letsencrypt.cid
