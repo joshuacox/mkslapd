@@ -4,5 +4,6 @@ prepopulate
 PASS
 DOMAIN
 NAME
+TAG
 PHPLDAPADMIN_PORT
 phpldapadmincid
