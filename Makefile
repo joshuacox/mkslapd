@@ -1,6 +1,5 @@
 .PHONY: all help build run builddocker rundocker kill rm-image rm clean enter logs
 
-
 all: help
 
 help:
@@ -14,9 +13,9 @@ help:
 	@echo ""   3. make logs      - follow the logs of docker container
 
 # run a plain container
-run: DATADIR NAME TAG PASS DOMAIN prod phpldapadmin LETSENCRYPT_MAIL
+run: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_MAIL prod phpldapadmin
 
-init: DATADIR NAME TAG PASS DOMAIN rm runinit LETSENCRYPT_MAIL
+init: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_MAIL rm runinit
 
 prod: rm runprod
 
