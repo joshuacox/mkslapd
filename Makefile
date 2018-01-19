@@ -39,8 +39,10 @@ runinit:
 	-e LDAP_DOMAIN=${DOMAIN} \
 	-e LDAP_ADMIN_PASSWORD=${PASS} \
 	-e LDAP_CONFIG_PASSWORD=${PASS} \
+	-e "VIRTUAL_HOST=$(DOMAIN)" \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slapd.d \
+	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:ro \
 	-t $(TAG)
 
 runprod:
@@ -54,8 +56,10 @@ runprod:
 	--hostname ${DOMAIN} \
 	-p 389:389 \
 	-p 636:636 \
+	-e "VIRTUAL_HOST=$(DOMAIN)" \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slapd.d \
+	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:ro \
 	-t $(TAG)
 
 kill:
@@ -123,6 +127,7 @@ phpldapadmincid:
 	-p ${PHPLDAPADMIN_PORT}:80 \
 	-e PHPLDAPADMIN_HTTPS=false \
 	--link ${NAME}:ldap-host \
+	-e "VIRTUAL_HOST=admin.$(DOMAIN)" \
 	-e PHPLDAPADMIN_LDAP_HOSTS=ldap-host \
 	-t osixia/phpldapadmin:0.6.12
 
@@ -131,3 +136,18 @@ prepopulate:
 
 creds: DOMAIN PASS
 	./showcreds
+
+letsencrypt:
+	$(eval NAME := $(shell cat NAME))
+	$(eval DOMAIN := $(shell cat DOMAIN))
+	$(eval DATADIR := $(shell cat DATADIR))
+	docker run -d \
+		--name=$(NAME)-nginx-letsencrypt \
+		--cidfile=".letsencrypt.cid" \
+		-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/etc/nginx/certs:rw \
+		-v /var/run/docker.sock:/var/run/docker.sock:ro \
+		--volumes-from $(NAME)-nginx \
+		jrcs/letsencrypt-nginx-proxy-companion
+
+TAG:
+	cp -i TAG.example TAG
