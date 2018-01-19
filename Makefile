@@ -164,6 +164,7 @@ nginx: .nginx.cid
 	$(eval DATADIR := $(shell cat DATADIR))
 	docker run -d -p 80:80 -p 443:443 \
 		--name $(NAME)-nginx \
+		--cidfile=".nginx-gen.cid" \
 		-v $(DATADIR)/nginx/conf.d:/etc/nginx/conf.d  \
 		-v $(DATADIR)/nginx/vhost.d:/etc/nginx/vhost.d \
 		-v $(DATADIR)/nginx/html:/usr/share/nginx/html \
@@ -179,6 +180,7 @@ nginx-gen: .nginx-gen.cid
 	$(eval DATADIR := $(shell cat DATADIR))
 	docker run -d \
 		--name $(NAME)-nginx-gen \
+		--cidfile=".nginx-gen.cid" \
 		--volumes-from $(NAME)-nginx \
 		-v $(DATADIR)/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro \
 		-v /var/run/docker.sock:/tmp/docker.sock:ro \
