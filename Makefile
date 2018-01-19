@@ -127,7 +127,7 @@ phpldapadmincid:
 	-t osixia/phpldapadmin:0.6.12
 
 prepopulate:
-	cp -av prepopulate.tempate prepopulate
+	cp -av prepopulate.template prepopulate
 
 creds: DOMAIN PASS
 	./showcreds
