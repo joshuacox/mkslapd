@@ -182,7 +182,7 @@ nginx-gen: .nginx-gen.cid
 		--name $(NAME)-nginx-gen \
 		--cidfile=".nginx-gen.cid" \
 		--volumes-from $(NAME)-nginx \
-		-v $(DATADIR)/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro \
+		-v $(DATADIR)/templates/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro \
 		-v /var/run/docker.sock:/tmp/docker.sock:ro \
 		--label com.github.jrcs.letsencrypt_nginx_proxy_companion.docker_gen \
 		jwilder/docker-gen \
