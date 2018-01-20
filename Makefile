@@ -13,9 +13,9 @@ help:
 	@echo ""   3. make logs      - follow the logs of docker container
 
 # run a plain container
-run: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_MAIL prod phpldapadmin
+run: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_EMAIL prod phpldapadmin
 
-init: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_MAIL rm runinit
+init: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_EMAIL rm runinit
 
 prod: rm runprod
 
@@ -26,7 +26,7 @@ runinit: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	$(eval PWD := $(shell pwd))
 	$(eval PASS := $(shell cat PASS))
 	$(eval DOMAIN := $(shell cat DOMAIN))
-	$(eval LETSENCRYPT_MAIL := $(shell cat LETSENCRYPT_MAIL))
+	$(eval LETSENCRYPT_EMAIL := $(shell cat LETSENCRYPT_EMAIL))
 	@docker run --name=$(NAME) \
 	--cidfile="cid" \
 	-d \
@@ -38,7 +38,7 @@ runinit: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	-e LDAP_CONFIG_PASSWORD=${PASS} \
 	-e "VIRTUAL_HOST=$(DOMAIN)" \
 	-e "LETSENCRYPT_HOST=$(DOMAIN)" \
-	-e "LETSENCRYPT_MAIL=$(LETSENCRYPT_MAIL)" \
+	-e "LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL)" \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slapd.d \
 	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:rw \
@@ -49,7 +49,7 @@ runprod: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	$(eval DOMAIN := $(shell cat DOMAIN))
 	$(eval DATADIR := $(shell cat DATADIR))
 	$(eval TAG := $(shell cat TAG))
-	$(eval LETSENCRYPT_MAIL := $(shell cat LETSENCRYPT_MAIL))
+	$(eval LETSENCRYPT_EMAIL := $(shell cat LETSENCRYPT_EMAIL))
 	@docker run --name=$(NAME) \
 	--cidfile="cid" \
 	-d \
@@ -58,7 +58,7 @@ runprod: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	-p 636:636 \
 	-e "VIRTUAL_HOST=$(DOMAIN)" \
 	-e "LETSENCRYPT_HOST=$(DOMAIN)" \
-	-e "LETSENCRYPT_MAIL=$(LETSENCRYPT_MAIL)" \
+	-e "LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL)" \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slapd.d \
 	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:rw \
@@ -118,9 +118,9 @@ DOMAIN:
 		read -r -p "Enter the domain you wish to associate with this container [DOMAIN]: " DOMAIN; echo "$$DOMAIN">>DOMAIN; cat DOMAIN; \
 	done ;
 
-LETSENCRYPT_MAIL:
-	@while [ -z "$$LETSENCRYPT_MAIL" ]; do \
-		read -r -p "Enter the admin email for letsencrypt you wish to associate with this container [LETSENCRYPT_MAIL]: " LETSENCRYPT_MAIL; echo "$$LETSENCRYPT_MAIL">>LETSENCRYPT_MAIL; cat LETSENCRYPT_MAIL; \
+LETSENCRYPT_EMAIL:
+	@while [ -z "$$LETSENCRYPT_EMAIL" ]; do \
+		read -r -p "Enter the admin email for letsencrypt you wish to associate with this container [LETSENCRYPT_EMAIL]: " LETSENCRYPT_EMAIL; echo "$$LETSENCRYPT_EMAIL">>LETSENCRYPT_EMAIL; cat LETSENCRYPT_EMAIL; \
 	done ;
 
 DATADIR:
@@ -137,7 +137,7 @@ phpldapadmin: PHPLDAPADMIN_PORT .phpldapadmin.cid
 	$(eval PASS := $(shell cat PASS))
 	$(eval PHPLDAPADMIN_PORT := $(shell cat PHPLDAPADMIN_PORT))
 	$(eval DOMAIN := $(shell cat DOMAIN))
-	$(eval LETSENCRYPT_MAIL := $(shell cat LETSENCRYPT_MAIL))
+	$(eval LETSENCRYPT_EMAIL := $(shell cat LETSENCRYPT_EMAIL))
 	@docker run --name=$(NAME)-phpldapadmin \
 	--cidfile=".phpldapadmin.cid" \
 	-d \
@@ -146,7 +146,7 @@ phpldapadmin: PHPLDAPADMIN_PORT .phpldapadmin.cid
 	--link ${NAME}:ldap-host \
 	-e "VIRTUAL_HOST=admin.$(DOMAIN)" \
 	-e "LETSENCRYPT_HOST=admin.$(DOMAIN)" \
-	-e "LETSENCRYPT_MAIL=$(LETSENCRYPT_MAIL)" \
+	-e "LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL)" \
 	-e PHPLDAPADMIN_LDAP_HOSTS=ldap-host \
 	-t osixia/phpldapadmin:0.6.12
 
