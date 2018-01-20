@@ -142,7 +142,7 @@ PASS:
 
 PHPLDAPADMIN_PORT:
 	@while [ -z "$$PHPLDAPADMIN_PORT" ]; do \
-		read -r -p "Enter the admin pass you wish to associate with this container [PHPLDAPADMIN_PORT]: " PHPLDAPADMIN_PORT; echo "$$PHPLDAPADMIN_PORT">>PHPLDAPADMIN_PORT; cat PHPLDAPADMIN_PORT; \
+		read -r -p "Enter the phpldapadmin pot you wish to associate with this container [PHPLDAPADMIN_PORT]: " PHPLDAPADMIN_PORT; echo "$$PHPLDAPADMIN_PORT">>PHPLDAPADMIN_PORT; cat PHPLDAPADMIN_PORT; \
 	done ;
 
 DOMAIN:
