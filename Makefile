@@ -39,7 +39,6 @@ runinit: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	-e LDAP_CONFIG_PASSWORD=${PASS} \
 	-e LDAP_LOG_LEVEL="256" \
 	-e LDAP_ORGANISATION="organisation" \
-	-e LDAP_DOMAIN="domain" \
 	-e LDAP_BASE_DN=${DOMAIN} \
 	-e LDAP_READONLY_USER="false" \
 	-e LDAP_BACKEND="hdb" \
@@ -78,7 +77,6 @@ runprod: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	-e "LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL)" \
 	-e LDAP_LOG_LEVEL="256" \
 	-e LDAP_ORGANISATION="organisation" \
-	-e LDAP_DOMAIN="domain" \
 	-e LDAP_BASE_DN=${DOMAIN} \
 	-e LDAP_READONLY_USER="false" \
 	-e LDAP_BACKEND="hdb" \
