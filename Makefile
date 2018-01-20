@@ -27,9 +27,10 @@ runinit: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	$(eval PASS := $(shell cat PASS))
 	$(eval DOMAIN := $(shell cat DOMAIN))
 	$(eval LETSENCRYPT_EMAIL := $(shell cat LETSENCRYPT_EMAIL))
-	@docker run --name=$(NAME) \
+	docker run --name=$(NAME) \
 	--cidfile="cid" \
 	-d \
+	--expose 80 \
 	-p 389:389 \
 	-p 636:636 \
 	--hostname ${DOMAIN} \
@@ -50,10 +51,11 @@ runprod: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	$(eval DATADIR := $(shell cat DATADIR))
 	$(eval TAG := $(shell cat TAG))
 	$(eval LETSENCRYPT_EMAIL := $(shell cat LETSENCRYPT_EMAIL))
-	@docker run --name=$(NAME) \
+	docker run --name=$(NAME) \
 	--cidfile="cid" \
 	-d \
 	--hostname ${DOMAIN} \
+	--expose 80 \
 	-p 389:389 \
 	-p 636:636 \
 	-e "VIRTUAL_HOST=$(DOMAIN)" \
