@@ -40,6 +40,21 @@ runinit: .nginx.cid .nginx-gen.cid .letsencrypt.cid
 	-e "VIRTUAL_HOST=$(DOMAIN)" \
 	-e "LETSENCRYPT_HOST=$(DOMAIN)" \
 	-e "LETSENCRYPT_EMAIL=$(LETSENCRYPT_EMAIL)" \
+	-e LDAP_LOG_LEVEL="256" \
+	-e LDAP_ORGANISATION="organisation" \
+	-e LDAP_DOMAIN="domain" \
+	-e LDAP_BASE_DN=${DOMAIN} \
+	-e LDAP_READONLY_USER="false" \
+	-e LDAP_BACKEND="hdb" \
+	-e LDAP_TLS="true" \
+	-e LDAP_TLS_CRT_FILENAME="$(DOMAIN).crt" \
+	-e LDAP_TLS_KEY_FILENAME="$(DOMAIN).key" \
+	-e LDAP_TLS_CA_CRT_FILENAME="$(DOMAIN).chain.pem" \
+	-e LDAP_TLS_VERIFY_CLIENT="try" \
+	-e LDAP_TLS_ENFORCE="false" \
+	-e LDAP_REPLICATION="false" \
+	-e LDAP_REMOVE_CONFIG_AFTER_SETUP="true" \
+	-e LDAP_SSL_HELPER_PREFIX="ldap" \
 	-v $(DATADIR)/data:/var/lib/ldap \
 	-v $(DATADIR)/config:/etc/ldap/slapd.d \
 	-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/container/service/slapd/assets/certs:rw \
