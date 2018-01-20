@@ -195,7 +195,7 @@ nginx: .nginx.cid
 		-v $(DATADIR)/nginx/html:/usr/share/nginx/html \
 		-v $(DATADIR)/certs/letsencrypt/archive/$(DOMAIN):/etc/nginx/certs:ro \
 		--label com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy \
-		nginx
+		nginx:alpine
 
 nginx-gen: .nginx-gen.cid
 
