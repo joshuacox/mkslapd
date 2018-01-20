@@ -140,11 +140,6 @@ PASS:
 		read -r -p "Enter the admin pass you wish to associate with this container [PASS]: " PASS; echo "$$PASS">>PASS; cat PASS; \
 	done ;
 
-PHPLDAPADMIN_PORT:
-	@while [ -z "$$PHPLDAPADMIN_PORT" ]; do \
-		read -r -p "Enter the phpldapadmin pot you wish to associate with this container [PHPLDAPADMIN_PORT]: " PHPLDAPADMIN_PORT; echo "$$PHPLDAPADMIN_PORT">>PHPLDAPADMIN_PORT; cat PHPLDAPADMIN_PORT; \
-	done ;
-
 DOMAIN:
 	@while [ -z "$$DOMAIN" ]; do \
 		read -r -p "Enter the domain you wish to associate with this container [DOMAIN]: " DOMAIN; echo "$$DOMAIN">>DOMAIN; cat DOMAIN; \
@@ -167,13 +162,11 @@ phpldapadmin: PHPLDAPADMIN_PORT .phpldapadmin.cid
 	$(eval NAME := $(shell cat NAME))
 	$(eval PWD := $(shell pwd))
 	$(eval PASS := $(shell cat PASS))
-	$(eval PHPLDAPADMIN_PORT := $(shell cat PHPLDAPADMIN_PORT))
 	$(eval DOMAIN := $(shell cat DOMAIN))
 	$(eval LETSENCRYPT_EMAIL := $(shell cat LETSENCRYPT_EMAIL))
 	@docker run --name=$(NAME)-phpldapadmin \
 	--cidfile=".phpldapadmin.cid" \
 	-d \
-	-p ${PHPLDAPADMIN_PORT}:80 \
 	-e PHPLDAPADMIN_HTTPS=false \
 	--link ${NAME}:ldap-host \
 	-e "VIRTUAL_HOST=admin.$(DOMAIN)" \
