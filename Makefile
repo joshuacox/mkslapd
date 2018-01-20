@@ -155,7 +155,7 @@ DATADIR:
 		read -r -p "Enter the datadir you wish to associate with this container [DATADIR]: " DATADIR; echo "$$DATADIR">>DATADIR; cat DATADIR; \
 	done ;
 
-phpldapadmin: PHPLDAPADMIN_PORT .phpldapadmin.cid
+phpldapadmin: .phpldapadmin.cid
 
 .phpldapadmin.cid:
 	$(eval DATADIR := $(shell cat DATADIR))
