@@ -13,7 +13,7 @@ help:
 	@echo ""   3. make logs      - follow the logs of docker container
 
 # run a plain container
-run: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_EMAIL prod phpldapadmin
+run: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_EMAIL prod
 
 init: DATADIR NAME TAG PASS DOMAIN LETSENCRYPT_EMAIL rm runinit
 
